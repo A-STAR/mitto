@@ -1,0 +1,19 @@
+<section class="controls">
+  <button mat-raised-button color="primary" (click)="uploadCSVInput.click()">
+    <span>Upload CSV</span>&nbsp;<mat-icon>cloud_upload</mat-icon>
+  </button>
+
+  <input type="file" accept=".csv, text/csv" hidden #uploadCSVInput (change)="onUploadCSV($event)">
+
+  <button mat-raised-button color="primary" [disabled]="!messages?.length" (click)="onDownloadCSV()">
+    <span>Download CSV</span>&nbsp;<mat-icon>cloud_download</mat-icon>
+  </button>
+</section>
+
+<main>
+  <ng-container *ngIf="messages; else uploadData"></ng-container>
+</main>
+
+<ng-template #uploadData>
+  <p class="description">Please upload a data.</p>
+</ng-template>

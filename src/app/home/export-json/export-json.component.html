@@ -1,0 +1,17 @@
+<h1 mat-dialog-title>JSON Export</h1>
+
+<mat-dialog-content>
+  <pre><code>{{ json }}</code></pre>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button mat-stroked-button color="primary" mat-dialog-close>Close</button>
+
+  <button mat-raised-button color="primary" (click)="onCopy()">
+    <span>{{ copyButtonText }}</span>&nbsp;<mat-icon [hidden]="copyButtonText !== COPY_BUTTON_TEXT">file_copy</mat-icon>
+  </button>
+
+  <button mat-raised-button color="primary" (click)="onDownloadJSON()">
+    <span>Download JSON</span>&nbsp;<mat-icon>cloud_download</mat-icon>
+  </button>
+</mat-dialog-actions>

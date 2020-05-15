@@ -101,4 +101,19 @@ export class DataService {
     URL.revokeObjectURL(objectURL);
   }
 
+  copyText(text: string) {
+    const textAreaEl: HTMLTextAreaElement = document.createElement('textarea');
+
+    textAreaEl.textContent = text;
+
+    document.body.append(textAreaEl);
+
+    textAreaEl.select();
+    textAreaEl.setSelectionRange(0, 99999);
+
+    document.execCommand('copy');
+
+    document.body.removeChild(textAreaEl);
+  }
+
 }

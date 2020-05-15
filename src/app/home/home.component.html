@@ -8,6 +8,10 @@
   <button mat-raised-button color="primary" [disabled]="!messages?.length" (click)="onDownloadCSV()">
     <span>Download CSV</span>&nbsp;<mat-icon>cloud_download</mat-icon>
   </button>
+
+  <button mat-raised-button color="primary" [disabled]="!messages?.length" (click)="onExportJSON()">
+    <span>Export JSON</span>&nbsp;<mat-icon>code</mat-icon>
+  </button>
 </section>
 
 <main>

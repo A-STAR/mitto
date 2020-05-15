@@ -1,8 +1,11 @@
 import { Component } from '@angular/core';
+import { MatDialogConfig, MatDialog } from '@angular/material/dialog';
 
 import { Item as Message } from './shared/item.interface';
 
 import { DataService } from '../data.service';
+
+import { ExportJSONDialogData, ExportJSONComponent } from './export-json/export-json.component';
 
 @Component({
   selector: 'mit-home',
@@ -17,7 +20,7 @@ export class HomeComponent {
 
   #messages: Message[];
 
-  constructor(private dataService: DataService) { }
+  constructor(private dialog: MatDialog, private dataService: DataService) { }
 
   onUploadCSV(event: Event) {
     this.dataService
@@ -36,6 +39,17 @@ export class HomeComponent {
     const type = 'text/csv';
 
     this.dataService.downloadFile(csvData, filename, type);
+  }
+
+  onExportJSON() {
+    const json: string = JSON.stringify(this.#messages, undefined, 2);
+
+    const config: MatDialogConfig<ExportJSONDialogData> = {
+      width: '800px',
+      data: { json }
+    };
+
+    this.dialog.open(ExportJSONComponent, config);
   }
 
   private setMessages(items: Message[]) {

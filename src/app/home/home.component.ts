@@ -1,15 +1,17 @@
 import { Component, AfterViewChecked, ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup, FormControl, Validators, ValidatorFn } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 
 import { Item as Message } from './shared/item.interface';
+import { MessageData } from './shared/message-data.type';
 
 import { DataService } from '../data.service';
 
 import { ExportJSONDialogData, ExportJSONComponent } from './export-json/export-json.component';
 
-type MessageData = Message;
+import { phoneNumberValidator } from './shared/phone-number.validator';
 
 const ACTION_COLUMN = 'actions';
 
@@ -26,6 +28,10 @@ export class HomeComponent implements AfterViewChecked {
     return this.#messages;
   }
 
+  get editMessageForm(): FormGroup {
+    return this.#editMessageForm;
+  }
+
   get columns(): string[] {
     return this.#columns;
   }
@@ -39,10 +45,11 @@ export class HomeComponent implements AfterViewChecked {
   }
 
   #messages: Message[];
+  #editMessageForm: FormGroup;
   #columns: string[];
   #dataSource: MatTableDataSource<MessageData>;
 
-  constructor(private dialog: MatDialog, private dataService: DataService) { }
+  constructor(private fb: FormBuilder, private dialog: MatDialog, private dataService: DataService) { }
 
   ngAfterViewChecked() {
     if (this.sort && !this.#dataSource?.sort) {
@@ -96,7 +103,26 @@ export class HomeComponent implements AfterViewChecked {
     this.#columns = [...keys, ACTION_COLUMN];
     this.#messages = messages;
 
+    this.initForms(keys);
     this.setDataSource();
+  }
+
+  private initForms(keys: string[]) {
+    this.#editMessageForm = this.fb.group({});
+
+    keys
+      .filter((key: string): boolean => key !== 'messageUUID')
+      .forEach((key: string) => {
+        const validators: ValidatorFn[] = [Validators.required];
+
+        if (key === 'sender') {
+          validators.push(phoneNumberValidator);
+        }
+
+        const control: FormControl = this.fb.control(undefined, validators);
+
+        this.#editMessageForm.addControl(key, control);
+      });
   }
 
   private setDataSource() {

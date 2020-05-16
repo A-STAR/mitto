@@ -15,7 +15,43 @@
 </section>
 
 <main>
-  <ng-container *ngIf="messages; else uploadData"></ng-container>
+  <ng-container *ngIf="dataSource; else uploadData">
+    <mat-form-field class="filter" appearance="standard">
+      <mat-label>Filter</mat-label>
+      <input placeholder="+381600171972" matInput (keyup)="onFilter($event)">
+      <mat-icon matSuffix>filter_list</mat-icon>
+    </mat-form-field>
+
+    <div class="table mat-elevation-z8">
+      <mat-table matSort [dataSource]="dataSource">
+        <ng-container [ngSwitch]="column" [matColumnDef]="column" *ngFor="let column of columns">
+          <ng-container *ngSwitchDefault>
+            <mat-header-cell mat-sort-header *matHeaderCellDef>{{ column }}</mat-header-cell>
+
+            <mat-cell *matCellDef="let row">{{ row[column] }}</mat-cell>
+          </ng-container>
+
+          <ng-container *ngSwitchCase="ACTION_COLUMN">
+            <mat-header-cell *matHeaderCellDef>Actions</mat-header-cell>
+
+            <mat-cell *matCellDef="let row">
+              <button title="Edit" mat-icon-button color="primary" aria-label="Edit">
+                <mat-icon>edit</mat-icon>
+              </button>
+
+              <button title="Remove" mat-icon-button color="warn" aria-label="Remove">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </mat-cell>
+          </ng-container>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="columns"></mat-header-row>
+
+        <mat-row *matRowDef="let row; columns: columns"></mat-row>
+      </mat-table>
+    </div>
+  </ng-container>
 </main>
 
 <ng-template #uploadData>

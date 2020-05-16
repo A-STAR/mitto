@@ -28,20 +28,55 @@
           <ng-container *ngSwitchDefault>
             <mat-header-cell mat-sort-header *matHeaderCellDef>{{ column }}</mat-header-cell>
 
+            <mat-cell *matCellDef="let row">
+              <ng-container *ngIf="row.messageUUID !== editableMessageUUID; else input">{{ row[column] }}</ng-container>
+
+              <ng-template #input>
+                <mat-form-field appearance="standard" [formGroup]="editMessageForm">
+                  <input required matInput [formControlName]="column" (keyup.enter)="onSaveMessageEditing()"
+                    (keyup.esc)="onCancelMessageEditing()">
+                  <mat-error *ngIf="editMessageForm.get(column).hasError('required')">
+                    <strong>Required</strong>
+                  </mat-error>
+                  <mat-error *ngIf="editMessageForm.get(column).hasError('phoneNumber')
+                    && !editMessageForm.get(column).hasError('required')">
+                    Minimum <strong>12</strong> digits
+                  </mat-error>
+                </mat-form-field>
+              </ng-template>
+            </mat-cell>
+          </ng-container>
+
+          <ng-container *ngSwitchCase="MESSAGE_UUID_COLUMN">
+            <mat-header-cell mat-sort-header *matHeaderCellDef>{{ column }}</mat-header-cell>
+
             <mat-cell *matCellDef="let row">{{ row[column] }}</mat-cell>
           </ng-container>
 
           <ng-container *ngSwitchCase="ACTION_COLUMN">
             <mat-header-cell *matHeaderCellDef>Actions</mat-header-cell>
 
-            <mat-cell *matCellDef="let row">
-              <button title="Edit" mat-icon-button color="primary" aria-label="Edit">
-                <mat-icon>edit</mat-icon>
-              </button>
+            <mat-cell [ngSwitch]="row.messageUUID" *matCellDef="let row">
+              <ng-container *ngSwitchDefault>
+                <button title="Edit" mat-icon-button color="primary" aria-label="Edit" (click)="onEditMessage(row)">
+                  <mat-icon>edit</mat-icon>
+                </button>
 
-              <button title="Remove" mat-icon-button color="warn" aria-label="Remove">
-                <mat-icon>delete</mat-icon>
-              </button>
+                <button title="Remove" mat-icon-button color="warn" aria-label="Remove">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </ng-container>
+
+              <ng-container *ngSwitchCase="editableMessageUUID">
+                <button title="Save" mat-icon-button color="primary" aria-label="Save" (click)="onSaveMessageEditing()">
+                  <mat-icon>check_circle</mat-icon>
+                </button>
+
+                <button title="Cancel" mat-icon-button color="warn" aria-label="Cancel"
+                  (click)="onCancelMessageEditing()">
+                  <mat-icon>cancel</mat-icon>
+                </button>
+              </ng-container>
             </mat-cell>
           </ng-container>
         </ng-container>

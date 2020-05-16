@@ -13,6 +13,8 @@ import { ExportJSONDialogData, ExportJSONComponent } from './export-json/export-
 
 import { phoneNumberValidator } from './shared/phone-number.validator';
 
+const MESSAGE_UUID_COLUMN = 'messageUUID';
+
 const ACTION_COLUMN = 'actions';
 
 @Component({
@@ -36,6 +38,10 @@ export class HomeComponent implements AfterViewChecked {
     return this.#columns;
   }
 
+  get MESSAGE_UUID_COLUMN(): string {
+    return MESSAGE_UUID_COLUMN;
+  }
+
   get ACTION_COLUMN(): string {
     return ACTION_COLUMN;
   }
@@ -44,10 +50,15 @@ export class HomeComponent implements AfterViewChecked {
     return this.#dataSource;
   }
 
+  get editableMessageUUID(): string {
+    return this.#editableMessageUUID;
+  }
+
   #messages: Message[];
   #editMessageForm: FormGroup;
   #columns: string[];
   #dataSource: MatTableDataSource<MessageData>;
+  #editableMessageUUID: string;
 
   constructor(private fb: FormBuilder, private dialog: MatDialog, private dataService: DataService) { }
 
@@ -95,7 +106,73 @@ export class HomeComponent implements AfterViewChecked {
       .toLowerCase();
   }
 
+  onEditMessage(message: MessageData) {
+    this.#editableMessageUUID = message.messageUUID;
+
+    const formValue: {
+      [key: string]: string
+    } = {};
+
+    Object
+      .keys(this.#editMessageForm.controls)
+      .forEach((key: string) => {
+        formValue[key] = message[key];
+      });
+
+    this.#editMessageForm.setValue(formValue);
+  }
+
+  onSaveMessageEditing() {
+    const { invalid, pristine } = this.#editMessageForm;
+
+    Object
+      .keys(this.#editMessageForm.controls)
+      .forEach((key: string) => {
+        const control = this.#editMessageForm.get(key);
+
+        control.markAsTouched({
+          onlySelf: true
+        });
+      });
+
+    if (invalid || pristine) {
+      return;
+    }
+
+    const message: Message = {};
+
+    const messageKeys: string[] = this.#columns.slice(0, -1);
+
+    messageKeys.forEach((key: string) => {
+      const value: string = key === 'messageUUID'
+        ? this.#editableMessageUUID
+        : this.#editMessageForm.value[key];
+
+      message[key] = value;
+    });
+
+    const index: number = this.#messages.findIndex(({ messageUUID }: Message): boolean => {
+      return messageUUID === this.#editableMessageUUID;
+    });
+
+    this.#messages[index] = message;
+
+    this.#editableMessageUUID = undefined;
+    this.#editMessageForm.reset();
+
+    this.setDataSource();
+  }
+
+  onCancelMessageEditing() {
+    this.#editableMessageUUID = undefined;
+    this.#editMessageForm.reset();
+  }
+
   private setMessages(messages: Message[]) {
+    if (this.#editableMessageUUID) {
+      this.onCancelMessageEditing();
+    }
+
     this.#messages = messages;
 
     const keys: string[] = Object.keys(messages[0]);

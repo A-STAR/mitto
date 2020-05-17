@@ -1,4 +1,4 @@
-import { Component, AfterViewChecked, ViewChild } from '@angular/core';
+import { Component, OnInit, AfterViewChecked, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, FormGroupDirective, FormControl, Validators, ValidatorFn } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
@@ -13,6 +13,8 @@ import { ExportJSONDialogData, ExportJSONComponent } from './export-json/export-
 
 import { phoneNumberValidator } from './shared/phone-number.validator';
 
+import { MESSAGES_MOCK } from './shared/messages.mock';
+
 const MESSAGE_UUID_COLUMN = 'messageUUID';
 
 const ACTION_COLUMN = 'actions';
@@ -22,7 +24,7 @@ const ACTION_COLUMN = 'actions';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.sass']
 })
-export class HomeComponent implements AfterViewChecked {
+export class HomeComponent implements OnInit, AfterViewChecked {
 
   @ViewChild(MatSort) private sort: MatSort;
 
@@ -67,6 +69,10 @@ export class HomeComponent implements AfterViewChecked {
   #editableMessageUUID: string;
 
   constructor(private fb: FormBuilder, private dialog: MatDialog, private dataService: DataService) { }
+
+  ngOnInit() {
+    this.setMessages(MESSAGES_MOCK);
+  }
 
   ngAfterViewChecked() {
     if (this.sort && !this.#dataSource?.sort) {

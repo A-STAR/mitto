@@ -122,6 +122,16 @@ export class HomeComponent implements AfterViewChecked {
     this.#editMessageForm.setValue(formValue);
   }
 
+  onRemoveMessage(messageUUID: string) {
+    const index: number = this.#messages.findIndex((message: Message): boolean => {
+      return message.messageUUID === messageUUID;
+    });
+
+    this.#messages.splice(index, 1);
+
+    this.setDataSource();
+  }
+
   onSaveMessageEditing() {
     const { invalid, pristine } = this.#editMessageForm;
 

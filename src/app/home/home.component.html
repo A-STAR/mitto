@@ -62,7 +62,8 @@
                   <mat-icon>edit</mat-icon>
                 </button>
 
-                <button title="Remove" mat-icon-button color="warn" aria-label="Remove">
+                <button title="Remove" mat-icon-button color="warn" aria-label="Remove"
+                  (click)="onRemoveMessage(row.messageUUID)">
                   <mat-icon>delete</mat-icon>
                 </button>
               </ng-container>

@@ -1,5 +1,5 @@
 import { Component, AfterViewChecked, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, FormControl, Validators, ValidatorFn } from '@angular/forms';
+import { FormBuilder, FormGroup, FormGroupDirective, FormControl, Validators, ValidatorFn } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
@@ -30,6 +30,10 @@ export class HomeComponent implements AfterViewChecked {
     return this.#messages;
   }
 
+  get newMessageForm(): FormGroup {
+    return this.#newMessageForm;
+  }
+
   get editMessageForm(): FormGroup {
     return this.#editMessageForm;
   }
@@ -55,6 +59,8 @@ export class HomeComponent implements AfterViewChecked {
   }
 
   #messages: Message[];
+  #newMessageForm: FormGroup;
+  #newMessageFormGroupDirective: FormGroupDirective;
   #editMessageForm: FormGroup;
   #columns: string[];
   #dataSource: MatTableDataSource<MessageData>;
@@ -104,6 +110,36 @@ export class HomeComponent implements AfterViewChecked {
     this.#dataSource.filter = query
       .trim()
       .toLowerCase();
+  }
+
+  onSubmitNewMessageForm(fromGroupDirective: FormGroupDirective) {
+    const { invalid, pristine } = this.#newMessageForm;
+
+    this.#newMessageFormGroupDirective = fromGroupDirective;
+
+    if (invalid || pristine) {
+      return;
+    }
+
+    const message: Message = {};
+
+    const messageKeys: string[] = this.#columns.slice(0, -1);
+
+    const messageUUIDs: string[] = this.#messages.map(
+      ({ messageUUID }: Message): string => messageUUID
+    );
+
+    messageKeys.forEach((key: string) => {
+      const value: string = key === 'messageUUID'
+        ? this.dataService.getUUID(messageUUIDs)
+        : this.#newMessageForm.value[key];
+
+      message[key] = value;
+    });
+
+    this.#messages.unshift(message);
+
+    this.setDataSource();
   }
 
   onEditMessage(message: MessageData) {
@@ -195,6 +231,9 @@ export class HomeComponent implements AfterViewChecked {
   }
 
   private initForms(keys: string[]) {
+    this.#newMessageFormGroupDirective?.resetForm?.();
+
+    this.#newMessageForm = this.fb.group({});
     this.#editMessageForm = this.fb.group({});
 
     keys
@@ -206,9 +245,11 @@ export class HomeComponent implements AfterViewChecked {
           validators.push(phoneNumberValidator);
         }
 
-        const control: FormControl = this.fb.control(undefined, validators);
+        const newMessageFormControl: FormControl = this.fb.control(undefined, validators);
+        const editMessageFormControl: FormControl = this.fb.control(undefined, validators);
 
-        this.#editMessageForm.addControl(key, control);
+        this.#newMessageForm.addControl(key, editMessageFormControl);
+        this.#editMessageForm.addControl(key, newMessageFormControl);
       });
   }
 

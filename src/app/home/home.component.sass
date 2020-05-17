@@ -18,9 +18,15 @@ section.controls
     margin-bottom: 8px
 
 section.controls,
+section.new-message,
 mat-cell.mat-column-actions
   button:not(:last-of-type)
     margin-right: 8px
+
+section.new-message
+
+  form mat-form-field
+    display: block
 
 main
   padding-bottom: 64px
@@ -56,3 +62,55 @@ main
     display: flex
     justify-content: flex-end
     flex-wrap: wrap
+
+  section.new-message
+    form#message-form
+      display: flex
+      flex-wrap: wrap
+
+      mat-form-field
+        display: inline-block
+        margin-bottom: 8px
+
+      mat-form-field:nth-child(even)
+        margin-left: 16px
+
+      mat-form-field,
+      &:after
+        flex: 0 0 calc(50% - 16px)
+
+      &::after
+        order: 1
+        content: ""
+        height: 0
+
+@media (min-width: 800px)
+
+  section.new-message
+
+    form#message-form
+
+      mat-form-field
+        &:nth-child(even)
+          margin-left: unset
+
+        &:nth-child(3n + 2),
+        &:nth-child(3n + 3)
+          margin-left: 16px
+
+      mat-form-field,
+      &:before,
+      &:after
+        flex: 0 0 calc(33% - 2 / 3 * 16px)
+
+      &::before
+        order: 1
+        content: ""
+        height: 0
+
+@media (min-width: 1000px)
+
+  section.new-message
+
+    form#message-form
+      margin-right: 25%

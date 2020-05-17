@@ -116,4 +116,44 @@ export class DataService {
     document.body.removeChild(textAreaEl);
   }
 
+  getUUID(
+    usedUUIDs: string[],
+    chars: string = '0123456789abcdefghiklmnopqrstuvwxyz',
+    segmentLengths: number[] = [8, 4, 4, 4, 12],
+    delimiter = '-'
+  ): string {
+    const getRandomIDSegment = (length?: number): string => {
+      const charList: string[] = chars.split('');
+
+      if (!length) {
+        length = Math.floor(Math.random() * charList.length);
+      }
+
+      let randomString = '';
+
+      for (let i = 0; i < length; i++) {
+        randomString += charList[Math.floor(Math.random() * charList.length)];
+      }
+
+      return randomString;
+    };
+
+    const getRandomID = (): string => segmentLengths.reduce((
+      randomID: string,
+      segment: number
+    ): string => {
+      return `${randomID}${randomID.length ? delimiter : ''}${getRandomIDSegment(segment)}`;
+    }, '');
+
+    const getUUID = (): string => {
+      const id: string = getRandomID();
+
+      const isIDUsed: boolean = usedUUIDs.includes(id);
+
+      return isIDUsed ? getUUID() : id;
+    };
+
+    return getUUID();
+  }
+
 }

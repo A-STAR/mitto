@@ -16,6 +16,29 @@
 
 <main>
   <ng-container *ngIf="dataSource; else uploadData">
+    <section class="new-message">
+      <form id="message-form" required #formDirective="ngForm" [formGroup]="newMessageForm"
+        (ngSubmit)="onSubmitNewMessageForm(formDirective)">
+        <ng-container *ngFor="let column of columns | slice:0:-1">
+          <mat-form-field appearance="standard" *ngIf="column !== MESSAGE_UUID_COLUMN">
+            <mat-label>{{ column }}</mat-label>
+            <input required matInput [formControlName]="column">
+            <mat-error *ngIf="newMessageForm.get(column).hasError('required')">
+              <strong>Required</strong>
+            </mat-error>
+            <mat-error *ngIf="newMessageForm.get(column).hasError('phoneNumber')
+              && !newMessageForm.get(column).hasError('required')">
+              Minimum <strong>12</strong> digits
+            </mat-error>
+          </mat-form-field>
+        </ng-container>
+      </form>
+
+      <button form="message-form" mat-raised-button color="primary">Add Message</button>
+
+      <button type="reset" form="message-form" mat-button>Clear</button>
+    </section>
+
     <mat-form-field class="filter" appearance="standard">
       <mat-label>Filter</mat-label>
       <input placeholder="+381600171972" matInput (keyup)="onFilter($event)">
